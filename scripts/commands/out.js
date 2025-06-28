@@ -1,4 +1,4 @@
-module.exports config: {
+module.exports.config: {
     name: "out",
     version: "1.0.0",
     permission: 2, // শুধুমাত্র অ্যাডমিন পারবে
