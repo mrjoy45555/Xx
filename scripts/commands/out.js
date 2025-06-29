@@ -1,20 +1,31 @@
-module.exports.config: {
+module.exports = {
+  config: {
     name: "out",
     version: "1.0.0",
-    permission: 2, // শুধুমাত্র অ্যাডমিন পারবে
     credits: "Joy",
-    description: "বটকে গ্রুপ থেকে রিমুভ করে",
+    description: "Bot leaves the group",
+    usage: "[threadID (optional)]",
+    cooldowns: 5,
+    permissions: 2, // Admin only
     prefix: true,
+    category: "admin"
   },
 
-  start: async function ({ api, event }) {
-    const threadID = event.threadID;
+  start: async function ({ api, event, args }) {
+    const threadID = args[0] || event.threadID;
 
-    try {
-      await api.sendMessage("👋 ঠিক আছে, আমি এই গ্রুপ থেকে বের হয়ে যাচ্ছি...", threadID);
-      await api.removeUserFromGroup(api.getCurrentUserID(), threadID);
-    } catch (err) {
-      await api.sendMessage(`❌ আমি গ্রুপ ছাড়তে পারিনি: ${err.message}`, threadID);
-    }
-  },
+    // Thread info check (is group and sender is admin)
+    const info = await api.getThreadInfo(threadID);
+    const isGroup = info.isGroup;
+    const isAdmin = info.adminIDs.some(admin => admin.id === event.senderID);
+
+    if (!isGroup)
+      return api.sendMessage("❌ এই কমান্ডটি শুধুমাত্র গ্রুপে ব্যবহার করা যাবে।", event.threadID);
+    if (!isAdmin)
+      return api.sendMessage("❌ কেবলমাত্র গ্রুপ অ্যাডমিনরা এই কমান্ডটি ব্যবহার করতে পারবেন।", event.threadID);
+
+    api.sendMessage("👋 ঠিক আছে, আমি এই গ্রুপ থেকে চলে যাচ্ছি...", threadID, () => {
+      api.removeUserFromGroup(api.getCurrentUserID(), threadID);
+    });
+  }
 };
