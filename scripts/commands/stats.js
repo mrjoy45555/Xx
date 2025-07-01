@@ -31,7 +31,7 @@ module.exports.run = async function ({ api, event, Users, Threads }) {
   const latencyMessage = await api.sendMessage("Loading Data.......", threadID, messageID);
   const latency = Date.now() - startTime;
 
-  const data = `👤 Users: ${global.data.allUserID.length}\n👥 Threads: ${global.data.allThreadID.length}\n⏱️ Uptime: ${uptime}\n🖥️ OS: ${osDetails}\n🌐 Latency: ${latency} ms`;
+  const data = `👤 ======{ 𝐔𝐏𝐓𝐈𝐌𝐄 𝐑𝐎𝐁𝐎𝐓 }======┃\n\n→ Bot worked  ${hours} hours ${minutes} minutes ${seconds} seconds \n•━━━━━━━━━━━━━━━━━━━━━━━━•\n➠ 𝐉𝐎𝐘 𝐀𝐇𝐌𝐄𝐃\n➠ Bo𝐭 Name: ${global.config.BOTNAME}\n➠ Bot Prefix: ${global.config.PREFIX}\n➠ Commands count: ${commands.size}\n➠ Total Users: ${global.data.allUserID.length}\n➠ Total thread: ${global.data.allThreadID.length}\n➠ CPU in use:: ${pidusage.cpu.toFixed(1)}%\n➠ RAM: ${byte2mb(pidusage.memory)}\n➠ Ping: ${Date.now() - timeStart}ms\n➠ Character ID𝐭: ${id}\n•━━━━━━━━━━━━━━━━━━━━━━━━•\n[ ${timeNow} ]`;
 
   api.editMessage(`𝗕𝗼𝘁 𝗗𝗮𝘁𝗮 𝗦𝘁𝗮𝘁𝘀\n${global.line}\n${data}`, latencyMessage.messageID, threadID);
 };
