@@ -1,6 +1,7 @@
 const os = require("os");
 const pidusage = require("pidusage");
 const moment = require("moment");
+const axios = require("axios");
 
 module.exports.config = {
   name: "uptime",
@@ -8,22 +9,32 @@ module.exports.config = {
   permission: 0,
   credits: "Joy Ahmed",
   description: "Show bot status with system info",
-  prefix: true, // ✅ Prefix enabled
+  prefix: true,
   category: "System",
   usages: "uptime",
   cooldowns: 5,
 };
 
+// RAM converter
 function byte2mb(bytes) {
   return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 }
 
-module.exports.run = async function ({ api, event, args, Users, Threads, Currencies, commands }) {
+// Alternative getStreamFromURL for Merai bot
+async function getStreamFromURL(url) {
+  const res = await axios({
+    method: "GET",
+    url,
+    responseType: "stream"
+  });
+  return res.data;
+}
+
+module.exports.run = async function ({ api, event }) {
   const { threadID, messageID, senderID } = event;
   const timeStart = Date.now();
 
   try {
-    // Load system stats
     const uptimeSeconds = process.uptime();
     const hours = Math.floor(uptimeSeconds / 3600);
     const minutes = Math.floor((uptimeSeconds % 3600) / 60);
@@ -35,14 +46,15 @@ module.exports.run = async function ({ api, event, args, Users, Threads, Currenc
     const ping = Date.now() - timeStart;
     const timeNow = moment().format("YYYY-MM-DD HH:mm:ss");
 
-    const botName = global.config.BOTNAME || "Bot";
-    const prefix = global.config.PREFIX || "!";
-    const totalUsers = global.data.allUserID.length;
-    const totalThreads = global.data.allThreadID.length;
-    const commandCount = (commands?.size || global.client?.commands?.size || 0);
+    const botName = global.config.BOTNAME || "MeraiBot";
+    const prefix = global.config.PREFIX || ".";
+    const totalUsers = global.data?.allUserID?.length || 0;
+    const totalThreads = global.data?.allThreadID?.length || 0;
+    const commandCount = global.client?.commands?.size || 0;
+
     const id = senderID;
 
-    const message = `👤 ======{ 𝐔𝐏𝐓𝐈𝐌𝐄 𝐑𝐎𝐁𝐎𝐓 }======┃
+    const msg = `👤 ======{ 𝐔𝐏𝐓𝐈𝐌𝐄 𝐑𝐎𝐁𝐎𝐓 }======┃
 
 → Bot worked  ${hours} hours ${minutes} minutes ${seconds} seconds 
 •━━━━━━━━━━━━━━━━━━━━━━━━•
@@ -59,11 +71,11 @@ module.exports.run = async function ({ api, event, args, Users, Threads, Currenc
 •━━━━━━━━━━━━━━━━━━━━━━━━•
 [ ${timeNow} ]`;
 
-    const imgurLink = "https://i.imgur.com/PnuciON.jpeg"; // ✅ Static image (replace if needed)
+    const imgurLink = "https://i.imgur.com/PnuciON.jpeg"; // 🔁 এখানে তোমার ভিডিও/ছবি লিংক দাও
 
     return api.sendMessage({
-      body: message,
-      attachment: await global.utils.getStreamFromURL(imgurLink)
+      body: msg,
+      attachment: await getStreamFromURL(imgurLink)
     }, threadID, messageID);
 
   } catch (err) {
