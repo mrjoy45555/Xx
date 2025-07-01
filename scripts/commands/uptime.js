@@ -22,26 +22,27 @@ module.exports.run = async function ({ api, event, args, Users, Threads, Currenc
   const { threadID, messageID, senderID } = event;
   const timeStart = Date.now();
 
-  // Load system stats
-  const uptimeSeconds = process.uptime();
-  const hours = Math.floor(uptimeSeconds / 3600);
-  const minutes = Math.floor((uptimeSeconds % 3600) / 60);
-  const seconds = Math.floor(uptimeSeconds % 60);
+  try {
+    // Load system stats
+    const uptimeSeconds = process.uptime();
+    const hours = Math.floor(uptimeSeconds / 3600);
+    const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+    const seconds = Math.floor(uptimeSeconds % 60);
 
-  const usage = await pidusage(process.pid);
-  const cpu = usage.cpu.toFixed(1);
-  const ram = byte2mb(usage.memory);
-  const ping = Date.now() - timeStart;
-  const timeNow = moment().format("YYYY-MM-DD HH:mm:ss");
+    const usage = await pidusage(process.pid);
+    const cpu = usage.cpu.toFixed(1);
+    const ram = byte2mb(usage.memory);
+    const ping = Date.now() - timeStart;
+    const timeNow = moment().format("YYYY-MM-DD HH:mm:ss");
 
-  const botName = global.config.BOTNAME || "Bot";
-  const prefix = global.config.PREFIX || "!";
-  const totalUsers = global.data.allUserID.length;
-  const totalThreads = global.data.allThreadID.length;
-  const commandCount = commands.size;
-  const id = senderID;
+    const botName = global.config.BOTNAME || "Bot";
+    const prefix = global.config.PREFIX || "!";
+    const totalUsers = global.data.allUserID.length;
+    const totalThreads = global.data.allThreadID.length;
+    const commandCount = (commands?.size || global.client?.commands?.size || 0);
+    const id = senderID;
 
-  const message = `👤 ======{ 𝐔𝐏𝐓𝐈𝐌𝐄 𝐑𝐎𝐁𝐎𝐓 }======┃
+    const message = `👤 ======{ 𝐔𝐏𝐓𝐈𝐌𝐄 𝐑𝐎𝐁𝐎𝐓 }======┃
 
 → Bot worked  ${hours} hours ${minutes} minutes ${seconds} seconds 
 •━━━━━━━━━━━━━━━━━━━━━━━━•
@@ -58,10 +59,15 @@ module.exports.run = async function ({ api, event, args, Users, Threads, Currenc
 •━━━━━━━━━━━━━━━━━━━━━━━━•
 [ ${timeNow} ]`;
 
-  const imgurLink = "https://i.imgur.com/PnuciON.jpeg"; // ✅ তোমার পছন্দমতো Imgur ভিডিও লিংক এখানে দাও
+    const imgurLink = "https://i.imgur.com/PnuciON.jpeg"; // ✅ Static image (replace if needed)
 
-  return api.sendMessage({
-    body: message,
-    attachment: await global.utils.getStreamFromURL(imgurLink)
-  }, threadID, messageID);
+    return api.sendMessage({
+      body: message,
+      attachment: await global.utils.getStreamFromURL(imgurLink)
+    }, threadID, messageID);
+
+  } catch (err) {
+    console.log("Uptime command error:", err);
+    return api.sendMessage("❌ Error fetching bot status.", threadID, messageID);
+  }
 };
