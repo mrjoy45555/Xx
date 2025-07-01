@@ -1,37 +1,67 @@
-const fs = require("fs");
 const os = require("os");
+const pidusage = require("pidusage");
+const moment = require("moment");
 
 module.exports.config = {
   name: "stats",
   version: "1.0.0",
   permission: 0,
-  credits: "Jonell Magallanes",
-  description: "Showing The Status of Bot",
-    prefix: true,
+  credits: "Joy",
+  description: "Showing the status of the bot",
+  prefix: true,
   category: "System",
   usages: "stats",
   cooldowns: 9,
 };
 
-module.exports.run = async function ({ api, event, Users, Threads }) {
-  const threadID = event.threadID;
-  const messageID = event.messageID;
+function byte2mb(bytes) {
+  return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+}
 
-
+module.exports.run = async function ({ api, event, args, Users, Threads, Currencies, commands }) {
+  const { threadID, messageID } = event;
   const startTime = Date.now();
 
+  // Send "loading" message
+  const tempMsg = await api.sendMessage("Loading data...", threadID, messageID);
+
+  // Get system info
   const uptimeSeconds = process.uptime();
   const hours = Math.floor(uptimeSeconds / 3600);
   const minutes = Math.floor((uptimeSeconds % 3600) / 60);
   const seconds = Math.floor(uptimeSeconds % 60);
-  const uptime = `${hours} hours, ${minutes} minutes, ${seconds} seconds`;
 
-  const osDetails = `${os.type()} ${os.release()} (${os.arch()})`;
+  const usage = await pidusage(process.pid);
 
-  const latencyMessage = await api.sendMessage("Loading Data.......", threadID, messageID);
-  const latency = Date.now() - startTime;
+  const cpu = usage.cpu.toFixed(1);
+  const ram = byte2mb(usage.memory);
+  const ping = Date.now() - startTime;
+  const timeNow = moment().format("YYYY-MM-DD HH:mm:ss");
 
-  const data = `👤 ======{ 𝐔𝐏𝐓𝐈𝐌𝐄 𝐑𝐎𝐁𝐎𝐓 }======┃\n\n→ Bot worked  ${hours} hours ${minutes} minutes ${seconds} seconds \n•━━━━━━━━━━━━━━━━━━━━━━━━•\n➠ 𝐉𝐎𝐘 𝐀𝐇𝐌𝐄𝐃\n➠ Bo𝐭 Name: ${global.config.BOTNAME}\n➠ Bot Prefix: ${global.config.PREFIX}\n➠ Commands count: ${commands.size}\n➠ Total Users: ${global.data.allUserID.length}\n➠ Total thread: ${global.data.allThreadID.length}\n➠ CPU in use:: ${pidusage.cpu.toFixed(1)}%\n➠ RAM: ${byte2mb(pidusage.memory)}\n➠ Ping: ${Date.now() - timeStart}ms\n➠ Character ID𝐭: ${id}\n•━━━━━━━━━━━━━━━━━━━━━━━━•\n[ ${timeNow} ]`;
+  const botName = global.config.BOTNAME || "Bot";
+  const prefix = global.config.PREFIX || "!";
+  const totalUsers = global.data.allUserID.length;
+  const totalThreads = global.data.allThreadID.length;
+  const totalCommands = commands.size;
+  const osInfo = `${os.type()} ${os.release()} (${os.arch()})`;
 
-  api.editMessage(`𝗕𝗼𝘁 𝗗𝗮𝘁𝗮 𝗦𝘁𝗮𝘁𝘀\n${global.line}\n${data}`, latencyMessage.messageID, threadID);
+  const stats = 
+`👤 ======『 𝗨𝗣𝗧𝗜𝗠𝗘 𝗦𝗧𝗔𝗧𝗦 』====== 👤
+
+⏰ Uptime: ${hours}h ${minutes}m ${seconds}s
+🤖 Bot Name: ${botName}
+📌 Prefix: ${prefix}
+📚 Total Commands: ${totalCommands}
+👥 Users: ${totalUsers}
+💬 Threads: ${totalThreads}
+🧠 CPU: ${cpu}%
+💾 RAM: ${ram}
+📡 Ping: ${ping}ms
+🖥️ OS: ${osInfo}
+
+⏱️ Time Now: ${timeNow}
+━━━━━━━━━━━━━━━━━━━━━━━`;
+
+  // Edit previous message with final stats
+  api.editMessage(stats, tempMsg.messageID, threadID);
 };
