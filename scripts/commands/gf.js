@@ -1,4 +1,4 @@
-const axios = require("axios");
+const request = require("request");
 const fs = require("fs-extra");
 const path = require("path");
 const jimp = require("jimp");
