@@ -1,4 +1,4 @@
-const request = require("request");
+const axios = require("axios");
 const fs = require("fs-extra");
 const path = require("path");
 const jimp = require("jimp");
@@ -20,7 +20,7 @@ module.exports.onLoad = async () => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   const bgPath = path.join(dir, "arr2.png");
   if (!fs.existsSync(bgPath)) {
-    const img = await axios.get("https://i.imgur.com/iaOiAXe.jpeg", { responseType: "arraybuffer" });
+    const img = await axios.get("https://i.postimg.cc/qRGWJqxK/iaOiAXe.jpg", { responseType: "arraybuffer" });
     fs.writeFileSync(bgPath, img.data);
   }
 };
