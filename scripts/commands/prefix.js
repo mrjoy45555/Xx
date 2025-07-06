@@ -4,7 +4,7 @@ const moment = require("moment-timezone");
 module.exports = {
   config: {
     name: "prefix",
-    version: "2.0",
+    version: "2.1",
     permission: 0,
     credits: "Joy Ahmed",
     description: "Show bot prefix and information",
@@ -38,9 +38,9 @@ module.exports = {
     const day = dayConvert[today] || today;
 
     try {
-      const res = await axios.get("https://imran-api.onrender.com/video/crush");
-      const videoUrl = res.data.data;
-      const videoStream = (await axios.get(videoUrl, { responseType: "stream" })).data;
+      const img = (await axios.get("https://i.postimg.cc/76ZtjdV1/Joy1.jpg", {
+        responseType: "stream"
+      })).data;
 
       const msg = `💐 ====『 𝗣𝗥𝗘𝗙𝗜𝗫 』==== 💐
 ━━━━━━━━━━━━━━━━━━━
@@ -55,12 +55,12 @@ module.exports = {
 
       return message.reply({
         body: msg,
-        attachment: videoStream
+        attachment: img
       });
 
     } catch (err) {
       console.error("❌ Prefix Command Error:", err.message);
-      return message.reply("⚠️ ভিডিও আনতে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।");
+      return message.reply("⚠️ ছবি আনতে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।");
     }
   }
 };
