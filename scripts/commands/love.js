@@ -7,7 +7,7 @@ module.exports.config = {
   name: "love",
   version: "2.0.0",
   permssion: 0,
-  credits: "Joy Ahmed",
+  credits: "Joy Ahme", // 💡 কেউ এটা চেঞ্জ করলে কমান্ড কাজ করবে না
   description: "Create a love frame image with mentioned person",
   prefix: true,
   category: "Love",
@@ -21,14 +21,21 @@ module.exports.config = {
   }
 };
 
+// 🔒 Credit Protection
+const AUTHOR = "Joy Ahmed";
+
 module.exports.onLoad = async () => {
+  if (module.exports.config.credits !== AUTHOR) {
+    throw new Error("\n❌ Credit has been changed! Please respect original author: " + AUTHOR);
+  }
+
   const cacheDir = path.join(__dirname, "cache", "canvas");
   const framePath = path.join(cacheDir, "love_frame.png");
 
   if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
   if (!fs.existsSync(framePath)) {
     await global.utils.downloadFile(
-      "https://i.postimg.cc/LXnmhGNv/joyahmed404.png", // 🔁 Replace with your love frame URL
+      "https://i.postimg.cc/LXnmhGNv/joyahmed404.png",
       framePath
     );
   }
@@ -75,8 +82,12 @@ async function makeImage({ one, two }) {
 
 module.exports.run = async function ({ event, api }) {
   const { threadID, messageID, senderID, mentions } = event;
-  const mentionIDs = Object.keys(mentions);
 
+  if (module.exports.config.credits !== AUTHOR) {
+    return api.sendMessage("❌ Unauthorized modification detected.\nPlease keep original credits: " + AUTHOR, threadID, messageID);
+  }
+
+  const mentionIDs = Object.keys(mentions);
   if (!mentionIDs.length) {
     return api.sendMessage("🥀 যার সাথে ফ্রেম বানাতে চান তাকে মেনশন করুন!", threadID, messageID);
   }
