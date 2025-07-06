@@ -7,7 +7,7 @@ module.exports.config = {
   name: "love",
   version: "2.0.0",
   permssion: 0,
-  credits: "Joy Ahme", // 💡 কেউ এটা চেঞ্জ করলে কমান্ড কাজ করবে না
+  credits: "Joy Ahmed", // 💡 কেউ এটা চেঞ্জ করলে কমান্ড কাজ করবে না
   description: "Create a love frame image with mentioned person",
   prefix: true,
   category: "Love",
